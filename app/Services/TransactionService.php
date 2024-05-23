@@ -3,8 +3,7 @@
 namespace App\Services;
 
 use App\Exceptions\CustomUnauthorizedException;
-use App\Models\Transaction;
-use App\Models\User;
+use App\Models\{Transaction, User};
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
@@ -14,6 +13,10 @@ class TransactionService
     public NotificationService $notificationService;
     private string $authorizationURL;
 
+    /**
+     * @param UserService           $userService
+     * @param NotificationService   $notificationService
+     */
     public function __construct(UserService $userService, NotificationService $notificationService)
     {
         $this->userService      = $userService;
@@ -22,6 +25,8 @@ class TransactionService
     }
 
     /**
+     * @param array $data
+     * @return Transaction
      * @throws CustomUnauthorizedException
      * @throws GuzzleException
      */
@@ -63,6 +68,12 @@ class TransactionService
         }
     }
 
+    /**
+     * @param User $sender
+     * @param User $receiver
+     * @param float $amount
+     * @return Transaction
+     */
     private function saveTransaction(User $sender, User $receiver, float $amount): Transaction
     {
         return Transaction::create([
@@ -72,6 +83,12 @@ class TransactionService
         ]);
     }
 
+    /**
+     * @param User $sender
+     * @param User $receiver
+     * @param float $amount
+     * @return void
+     */
     private function saveUserBalance(User $sender, User $receiver, float $amount): void
     {
         $sender->balance -= $amount;

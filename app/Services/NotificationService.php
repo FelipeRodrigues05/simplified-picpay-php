@@ -4,9 +4,15 @@ namespace App\Services;
 
 use App\Models\User;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
 class NotificationService
 {
+    /**
+     * @param User $user
+     * @return mixed
+     * @throws GuzzleException
+     */
     public function sendNotification(User $user): mixed {
         $client = new Client();
 

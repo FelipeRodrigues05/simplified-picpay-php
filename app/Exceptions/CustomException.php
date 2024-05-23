@@ -9,6 +9,9 @@ use Illuminate\Http\Response;
 
 class CustomException extends Exception
 {
+    /**
+     * @return Response|Application|ResponseFactory
+     */
     public function render(): Response|Application|ResponseFactory
     {
         return response(['success' => false, 'message' => $this->message], 401);

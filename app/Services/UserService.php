@@ -9,7 +9,10 @@ use App\Models\User;
 class UserService
 {
     /**
-     * @throws \Exception
+     * @param User $user
+     * @param float $amount
+     * @return void
+     * @throws CustomException
      */
     public function validateTransaction(User $user, float $amount): void
     {
@@ -22,6 +25,10 @@ class UserService
         }
     }
 
+    /**
+     * @param int $id
+     * @return User
+     */
     public function findUserByID(int $id): User
     {
         return User::find($id);

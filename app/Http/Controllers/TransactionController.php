@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Resources\TransactionResource;
-use App\Models\Transaction;
 use App\Services\TransactionService;
+use App\Models\Transaction;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -22,6 +22,7 @@ class TransactionController extends Controller
 
     /**
      * Display a listing of the resource.
+     * @return AnonymousResourceCollection
      */
     public function index(): AnonymousResourceCollection
     {
@@ -30,6 +31,8 @@ class TransactionController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * @param StoreTransactionRequest  $request
+     * @return TransactionResource
      */
     public function store(StoreTransactionRequest $request): TransactionResource
     {
@@ -38,6 +41,8 @@ class TransactionController extends Controller
 
     /**
      * Display the specified resource.
+     * @param Transaction $transaction
+     * @return TransactionResource
      */
     public function show(Transaction $transaction): TransactionResource
     {
@@ -46,6 +51,7 @@ class TransactionController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * @return \Illuminate\Foundation\Application|Response|Application|ResponseFactory
      */
     public function update(): \Illuminate\Foundation\Application|Response|Application|ResponseFactory
     {
@@ -54,6 +60,7 @@ class TransactionController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * @return \Illuminate\Foundation\Application|Response|Application|ResponseFactory
      */
     public function destroy(): \Illuminate\Foundation\Application|Response|Application|ResponseFactory
     {
