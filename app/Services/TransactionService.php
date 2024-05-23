@@ -11,11 +11,13 @@ use GuzzleHttp\Exception\GuzzleException;
 class TransactionService
 {
     public UserService $userService;
+    public NotificationService $notificationService;
     private string $authorizationURL;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserService $userService, NotificationService $notificationService)
     {
         $this->userService      = $userService;
+        $this->notificationService = $notificationService;
         $this->authorizationURL = env('AUTHORIZATION_URL');
     }
 
@@ -37,6 +39,9 @@ class TransactionService
         }
 
         $this->saveUserBalance($sender, $receiver, $data['amount']);
+
+        $this->notificationService->sendNotification($sender);
+        $this->notificationService->sendNotification($receiver);
 
         return $this->saveTransaction($sender, $receiver, $data['amount']);
     }
