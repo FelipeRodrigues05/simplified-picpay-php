@@ -13,8 +13,9 @@ class NotificationService
      * @return mixed
      * @throws GuzzleException
      */
-    public function sendNotification(User $user): mixed {
-        $client = new Client();
+    public function sendNotification(User $user): mixed
+    {
+        $client = new Client;
 
         $notificationResponse = $client->post(env('NOTIFICATION_URL'), [
             'json' => [

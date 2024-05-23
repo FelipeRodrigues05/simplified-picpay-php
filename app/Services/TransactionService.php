@@ -57,7 +57,7 @@ class TransactionService
     private function authorizeTransaction(): mixed
     {
         try {
-            $client = new Client();
+            $client = new Client;
             $response = $client->get($this->authorizationURL);
 
             $responseContent = json_decode($response->getBody()->getContents(), true)['data'];
