@@ -55,7 +55,7 @@ class TransactionService
     private function saveUserBalance(User $sender, User $receiver, Decimal $amount): void {
         $sender->balance = $sender->balance->subtract($amount);
         $receiver->balance = $receiver->balance->add($amount);
-        
+
         $sender->save();
         $receiver->save();
 

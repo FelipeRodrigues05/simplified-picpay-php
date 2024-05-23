@@ -50,4 +50,5 @@ class User extends Authenticatable
             'balance' => 'decimal:2',
         ];
     }
+
 }
