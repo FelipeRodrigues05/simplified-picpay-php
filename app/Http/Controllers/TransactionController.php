@@ -3,43 +3,45 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTransactionRequest;
+use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
 use App\Services\TransactionService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
 class TransactionController extends Controller
 {
     public TransactionService $transactionService;
 
-    public function __construct(TransactionService $transactionService) {
+    public function __construct(TransactionService $transactionService)
+    {
         $this->transactionService = $transactionService;
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index(): Collection
+    public function index(): AnonymousResourceCollection
     {
-        return Transaction::all();
+        return TransactionResource::collection(Transaction::paginate());
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTransactionRequest $request): Transaction
+    public function store(StoreTransactionRequest $request): TransactionResource
     {
-        return $this->transactionService->createTransaction($request);
+        return new TransactionResource($this->transactionService->createTransaction($request->validated()));
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Transaction $transaction): Transaction
+    public function show(Transaction $transaction): TransactionResource
     {
-        return $transaction;
+        return new TransactionResource($transaction);
     }
 
     /**

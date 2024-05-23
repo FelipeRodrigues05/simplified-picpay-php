@@ -14,12 +14,14 @@ class TransactionService
     public UserService $userService;
     private string $authorizationURL;
 
-    public function __construct(UserService $userService) {
+    public function __construct(UserService $userService)
+    {
         $this->userService = $userService;
         $this->authorizationURL = "https://util.devi.tools/api/v2/authorize";
     }
 
-    public function createTransaction(StoreTransactionRequest $request): Transaction {
+    public function createTransaction(StoreTransactionRequest $request): Transaction
+    {
         $sender = $this->userService->findUserByID($request->sender_id);
         $receiver = $this->userService->findUserByID($request->receiver_id);
 
@@ -36,15 +38,18 @@ class TransactionService
         return $this->saveTransaction($sender, $receiver, $request->amount);
     }
 
-    private function authorizeTransaction(): Transaction {
+    private function authorizeTransaction(): Transaction
+    {
         $client = new Client();
         $response = $client->get($this->authorizationURL);
 
-        $responseContent = json_decode($response->getBody()->getContents(), true);
-        return $responseContent['data']['authorization'];
+        $responseContent = json_decode($response->getBody()->getContents(), true)['data'];
+
+        return $responseContent['authorization'];
     }
 
-    private function saveTransaction(User $sender, User $receiver, Decimal $amount): Transaction {
+    private function saveTransaction(User $sender, User $receiver, Decimal $amount): Transaction
+    {
         return Transaction::create([
             'sender_id' => $sender->id,
             'receiver_id' => $receiver->id,
@@ -52,7 +57,8 @@ class TransactionService
         ]);
     }
 
-    private function saveUserBalance(User $sender, User $receiver, Decimal $amount): void {
+    private function saveUserBalance(User $sender, User $receiver, Decimal $amount): void
+    {
         $sender->balance = $sender->balance->subtract($amount);
         $receiver->balance = $receiver->balance->add($amount);
 
