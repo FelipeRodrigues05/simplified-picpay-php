@@ -47,7 +47,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'usertype' => \App\Enum\UserType::class,
-            'balance' => 'decimal:2',
+            'balance' => 'float:2',
         ];
     }
 

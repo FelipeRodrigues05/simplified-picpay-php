@@ -2,12 +2,11 @@
 
 namespace App\Services;
 
-use App\Http\Requests\StoreTransactionRequest;
+use App\Exceptions\CustomUnauthorizedException;
 use App\Models\Transaction;
 use App\Models\User;
-use Decimal\Decimal;
 use GuzzleHttp\Client;
-use Illuminate\Validation\UnauthorizedException;
+use GuzzleHttp\Exception\GuzzleException;
 
 class TransactionService
 {
@@ -16,55 +15,64 @@ class TransactionService
 
     public function __construct(UserService $userService)
     {
-        $this->userService = $userService;
-        $this->authorizationURL = "https://util.devi.tools/api/v2/authorize";
+        $this->userService      = $userService;
+        $this->authorizationURL = env('AUTHORIZATION_URL');
     }
 
-    public function createTransaction(StoreTransactionRequest $request): Transaction
+    /**
+     * @throws CustomUnauthorizedException
+     * @throws GuzzleException
+     */
+    public function createTransaction(array $data): Transaction
     {
-        $sender = $this->userService->findUserByID($request->sender_id);
-        $receiver = $this->userService->findUserByID($request->receiver_id);
+        $sender     = $this->userService->findUserByID($data['sender_id']);
+        $receiver   = $this->userService->findUserByID($data['receiver_id']);
 
-        $this->userService->validateTransaction($sender, $request->amount);
+        $this->userService->validateTransaction($sender, $data['amount']);
 
         $isAuthorized = $this->authorizeTransaction();
 
         if(!$isAuthorized) {
-            throw new UnauthorizedException("Unauthorized transaction");
+            throw new CustomUnauthorizedException("Unauthorized transaction");
         }
 
-        $this->saveUserBalance($sender, $receiver, $request->amount);
+        $this->saveUserBalance($sender, $receiver, $data['amount']);
 
-        return $this->saveTransaction($sender, $receiver, $request->amount);
+        return $this->saveTransaction($sender, $receiver, $data['amount']);
     }
 
-    private function authorizeTransaction(): Transaction
+    /**
+     * @throws GuzzleException
+     */
+    private function authorizeTransaction(): mixed
     {
-        $client = new Client();
-        $response = $client->get($this->authorizationURL);
+        try {
+            $client = new Client();
+            $response = $client->get($this->authorizationURL);
 
-        $responseContent = json_decode($response->getBody()->getContents(), true)['data'];
+            $responseContent = json_decode($response->getBody()->getContents(), true)['data'];
 
-        return $responseContent['authorization'];
+            return $responseContent['authorization'];
+        } catch(\Exception $e) {
+            return response(['success' => false, 'message' => $e->getMessage()], $e->getCode());
+        }
     }
 
-    private function saveTransaction(User $sender, User $receiver, Decimal $amount): Transaction
+    private function saveTransaction(User $sender, User $receiver, float $amount): Transaction
     {
         return Transaction::create([
-            'sender_id' => $sender->id,
-            'receiver_id' => $receiver->id,
-            'amount' => $amount
+            'sender_id'     => $sender->id,
+            'receiver_id'   => $receiver->id,
+            'amount'        => $amount
         ]);
     }
 
-    private function saveUserBalance(User $sender, User $receiver, Decimal $amount): void
+    private function saveUserBalance(User $sender, User $receiver, float $amount): void
     {
-        $sender->balance = $sender->balance->subtract($amount);
-        $receiver->balance = $receiver->balance->add($amount);
+        $sender->balance -= $amount;
+        $receiver->balance += $amount;
 
         $sender->save();
         $receiver->save();
-
-        return;
     }
 }

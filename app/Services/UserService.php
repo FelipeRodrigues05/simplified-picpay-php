@@ -3,37 +3,27 @@
 namespace App\Services;
 
 use App\Enum\UserType;
+use App\Exceptions\CustomException;
 use App\Models\User;
-use Decimal\Decimal;
 
 class UserService
 {
     /**
      * @throws \Exception
      */
-    public function validateTransaction(User $user, Decimal $amount)
+    public function validateTransaction(User $user, float $amount): void
     {
-        if ($user->usertype == UserType::SHOPKEEPER) {
-            throw new \Exception('Shopkeepers cannot make transactions');
+        if ($user->user_type == UserType::SHOPKEEPER->value) {
+            throw new CustomException('Shopkeepers cannot make transactions');
         }
 
-        if ($user->balance->compare($amount) < 0) {
-            throw new \Exception('Insufficient funds');
+        if (($user->balance < $amount) || $user->balance == 0) {
+            throw new CustomException('Insufficient funds');
         }
     }
 
-    public function findUserByID(User $user): User
+    public function findUserByID(int $id): User
     {
-        return $user;
-    }
-
-    public function findUserByEmail(User $user)
-    {
-        return User::where('email', $user->email);
-    }
-
-    public function saveUser(User $user)
-    {
-        return User::create($user);
+        return User::find($id);
     }
 }

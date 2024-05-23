@@ -10,14 +10,12 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('transaction', function (Blueprint $table) {
+        Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->unsignedBigInteger('sender_id');
-            $table->unsignedBigInteger('receiver_id');
             $table->decimal('amount');
-            $table->foreign('sender_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('receiver_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreignIdFor(\App\Models\User::class, 'sender_id');
+            $table->foreignIdFor(\App\Models\User::class, 'receiver_id');
             $table->softDeletes();
         });
     }

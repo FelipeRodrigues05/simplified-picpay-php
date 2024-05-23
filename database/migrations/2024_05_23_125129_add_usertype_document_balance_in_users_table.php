@@ -12,9 +12,9 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum("user_type", [UserType::DEFAULT, UserType::SHOPKEEPER])->default(UserType::DEFAULT);
+            $table->enum("user_type", [UserType::DEFAULT->value, UserType::SHOPKEEPER->value])->default(UserType::DEFAULT);
             $table->string("document")->unique();
-            $table->decimal("balance")->default(0);
+            $table->float("balance")->default(0);
         });
     }
 

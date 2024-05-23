@@ -11,21 +11,21 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = [
-        'senderId',
-        'receiverId',
+        'sender_id',
+        'receiver_id',
         'amount',
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
+        'amount' => 'float:2',
     ];
 
     public function receiver(): HasMany
     {
-        return $this->hasMany(User::class, 'receiverId');
+        return $this->hasMany(User::class, 'receiver_id');
     }
     public function sender(): HasMany
     {
-        return $this->hasMany(User::class, 'senderId');
+        return $this->hasMany(User::class, 'sender_id');
     }
 }
